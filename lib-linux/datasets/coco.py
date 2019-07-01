@@ -13,7 +13,7 @@ import os
 import numpy as np
 import scipy.sparse
 import scipy.io as sio
-import cPickle
+import pickle as cPickle
 import json
 import uuid
 # COCO API
