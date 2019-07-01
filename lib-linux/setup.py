@@ -37,7 +37,7 @@ def locate_cuda():
     # first check if the CUDAHOME env variable is in use
     if 'CUDAHOME' in os.environ:
         home = os.environ['CUDAHOME']
-        nvcc = pjoin(home, 'bin', 'nvcc')
+        nvcc = pjoin(home, 'bin', 'nvcc.exe')
     else:
         # otherwise, search the PATH for NVCC
         default_path = pjoin(os.sep, 'usr', 'local', 'cuda', 'bin')
@@ -49,8 +49,9 @@ def locate_cuda():
 
     cudaconfig = {'home':home, 'nvcc':nvcc,
                   'include': pjoin(home, 'include'),
-                  'lib64': pjoin(home, 'lib64')}
-    for k, v in cudaconfig.iteritems():
+                  'lib64': pjoin(home, 'lib\\x64')}
+#    for k, v in cudaconfig.iteritems(): revised by zhaolei
+    for k, v in cudaconfig.items():
         if not os.path.exists(v):
             raise EnvironmentError('The CUDA %s path could not be located in %s' % (k, v))
 
@@ -101,15 +102,31 @@ def customize_compiler_for_nvcc(self):
     # inject our redefined _compile method into the class
     self._compile = _compile
 
+def msvc_compiler_for_nvcc(self):
+    self.compiler.src_extensions.append('.cu')
+    self.compiler.set_executable('compiler_so', 'nvcc')
+    self.compiler.set_executable('linker_so', 'nvcc --shared')
+    if hasattr(self.compiler, '_c_extensions'):
+        self.compiler._c_extensions.append('.cu')  # needed for Windows
+    self.compiler.spawn = self.spawn
+
 
 # run the customize_compiler
 class custom_build_ext(build_ext):
     def build_extensions(self):
-        customize_compiler_for_nvcc(self.compiler)
+        # customize_compiler_for_nvcc(self.compiler)
+        # msvc_compiler_for_nvcc(self.compiler)
+        self.compiler.src_extensions.append('.cu')
+        self.compiler.set_executable('compiler_so', 'nvcc')
+        self.compiler.set_executable('linker_so', 'nvcc --shared')
+        if hasattr(self.compiler, '_c_extensions'):
+            self.compiler._c_extensions.append('.cu')  # needed for Windows
+        self.compiler.spawn = self.spawn
+        print(self.compiler)
         build_ext.build_extensions(self)
 
 
-ext_modules = [
+ext_modules_linux = [
     Extension(
         "utils.cython_bbox",
         ["utils/bbox.pyx"],
@@ -148,9 +165,47 @@ ext_modules = [
     ),
 ]
 
+
+ext_modules_win = [
+    Extension(
+        "utils.cython_bbox",
+        ["utils/bbox.pyx"],
+        # extra_compile_args=["-Wno-cpp", "-Wno-unused-function",'-std=c99'],
+        extra_compile_args=['/Qstd=c99'],
+        include_dirs = [numpy_include]
+    ),
+    Extension(
+        "nms.cpu_nms",
+        ["nms/cpu_nms.pyx"],
+        # extra_compile_args=["-Wno-cpp", "-Wno-unused-function",'-std=c99'],
+        extra_compile_args=['/Qstd=c99'],
+        include_dirs = [numpy_include]
+    ),
+    Extension('nms.gpu_nms',
+        ['nms/nms_kernel.cu', 'nms/gpu_nms.pyx'],
+        library_dirs=[CUDA['lib64']],
+        libraries=['cudart'],
+        language='c++',
+        runtime_library_dirs=[CUDA['lib64']],
+        # this syntax is specific to this build system
+        # we're only going to use certain compiler args with nvcc and not with
+        # gcc the implementation of this trick is in customize_compiler() below
+        extra_compile_args=['--std=c99'],
+        include_dirs = [numpy_include, CUDA['include']]
+    ),
+    Extension(
+        'pycocotools._mask',
+        sources=['pycocotools/maskApi.c', 'pycocotools/_mask.pyx'],
+        include_dirs = [numpy_include, 'pycocotools'],
+        # extra_compile_args=['-Wno-cpp', '-Wno-unused-function', '-std=c99'],
+        extra_compile_args=['/Qstd=c99'],
+
+    ),
+]
+
 setup(
     name='fast_rcnn',
-    ext_modules=ext_modules,
+    ext_modules=ext_modules_win,
     # inject our custom trigger
     cmdclass={'build_ext': custom_build_ext},
 )
