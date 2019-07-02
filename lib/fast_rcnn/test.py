@@ -181,6 +181,8 @@ def im_detect(net, im, boxes=None):
         scores = scores[inv_index, :]
         pred_boxes = pred_boxes[inv_index, :]
 
+    print('pred_boxes.shape=',pred_boxes.shape)
+
     return scores, pred_boxes
 
 def vis_detections(im, class_name, dets, thresh=0.3):

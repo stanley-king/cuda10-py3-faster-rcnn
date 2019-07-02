@@ -73,6 +73,7 @@ class CUDA_build_ext(build_ext):
             #   call. In case we're running Anaconda, we search cl.exe in the
             #   original search path we captured further above -- Anaconda
             #   inserts a MSVC version into PATH that is too old for nvcc.
+            print(os.path.dirname(find_executable("cl", PATH)))
             cmd[:1] = ['nvcc', '--compiler-bindir',
                        os.path.dirname(find_executable("cl", PATH))
                        or cmd[0]]
@@ -106,6 +107,7 @@ class CUDA_build_ext(build_ext):
                 cmd.append('/NODEFAULTLIB:libcmt.lib')
             else:
                 pass_on = '--compiler-options='
+
             cmd = ([c for c in cmd if c[0] != '/'] +
                    [pass_on + ','.join(c for c in cmd if c[0] == '/')])
             # For the future: Apart from the wrongly set PATH by Anaconda, it

@@ -32,10 +32,8 @@ CLASSES = ('__background__',
            'motorbike', 'person', 'pottedplant',
            'sheep', 'sofa', 'train', 'tvmonitor')
 
-NETS = {'vgg16': ('VGG16',
-                  'VGG16_faster_rcnn_final.caffemodel'),
-        'zf': ('ZF',
-                  'ZF_faster_rcnn_final.caffemodel')}
+NETS = {'vgg16': ('VGG16','VGG16_faster_rcnn_final.caffemodel'),
+        'zf': ('ZF','ZF_faster_rcnn_final.caffemodel')}
 
 
 def vis_detections(im, class_name, dets, thresh=0.5):
@@ -83,8 +81,8 @@ def demo(net, image_name):
     timer.tic()
     scores, boxes = im_detect(net, im)
     timer.toc()
-    # print ('Detection took {:.3f}s for '
-    #        '{:d} object proposals').format(timer.total_time, boxes.shape[0])
+    print ('Detection took {:.3f}s for '
+           '{:d} object proposals'.format(timer.total_time, boxes.shape[0]))
 
     # Visualize detections for each class
     CONF_THRESH = 0.8
@@ -94,8 +92,7 @@ def demo(net, image_name):
         cls_ind += 1 # because we skipped background
         cls_boxes = boxes[:, 4*cls_ind:4*(cls_ind + 1)]
         cls_scores = scores[:, cls_ind]
-        dets = np.hstack((cls_boxes,
-                          cls_scores[:, np.newaxis])).astype(np.float32)
+        dets = np.hstack((cls_boxes,cls_scores[:, np.newaxis])).astype(np.float32)
         keep = nms(dets, NMS_THRESH)
         dets = dets[keep, :]
         vis_detections(im, cls, dets, thresh=CONF_THRESH)
@@ -146,6 +143,7 @@ if __name__ == '__main__':
 
     im_names = ['000456.jpg', '000542.jpg', '001150.jpg',
                 '001763.jpg', '004545.jpg']
+    # im_names = ['000456.jpg']
     for im_name in im_names:
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('Demo for data/demo/{}'.format(im_name))
