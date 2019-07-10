@@ -96,7 +96,14 @@ class imdb(object):
         raise NotImplementedError
 
     def _get_widths(self):
-      return [PIL.Image.open(self.image_path_at(i)).size[0]
+        # widths = [PIL.Image.open(self.image_path_at(i)).size[0]
+        #           for i in range(self.num_images)]
+        for i in range(self.num_images):
+            file = self.image_path_at(i)
+            attrs = PIL.Image.open(file)
+            width = attrs.size[0]
+
+        return [PIL.Image.open(self.image_path_at(i)).size[0]
               for i in range(self.num_images)]
 
     def append_flipped_images(self):

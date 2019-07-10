@@ -57,6 +57,7 @@ class SolverWrapper(object):
         bounding-box regression weights. This enables easy use at test-time.
         """
         net = self.solver.net
+        print('net=',net)
 
         scale_bbox_params = (cfg.TRAIN.BBOX_REG and
                              cfg.TRAIN.BBOX_NORMALIZE_TARGETS and

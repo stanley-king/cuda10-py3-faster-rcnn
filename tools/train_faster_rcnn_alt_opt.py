@@ -100,9 +100,9 @@ def _init_caffe(cfg):
     # fix the random seeds (numpy and caffe) for reproducibility
     np.random.seed(cfg.RNG_SEED)
     caffe.set_random_seed(cfg.RNG_SEED)
-    # set up caffe
     caffe.set_mode_gpu()
     caffe.set_device(cfg.GPU_ID)
+    # caffe.set_mode_cpu()
 
 def train_rpn(queue=None, imdb_name=None, init_model=None, solver=None,
               max_iters=None, cfg=None):
@@ -215,6 +215,8 @@ if __name__ == '__main__':
     if args.set_cfgs is not None:
         cfg_from_list(args.set_cfgs)
     cfg.GPU_ID = args.gpu_id
+
+    args.pretrained_model = 'E:\\study\\py-faster-rcnn\\data\\imagenet_models\\ZF.v2.caffemodel'
 
     # --------------------------------------------------------------------------
     # Pycaffe doesn't reliably free GPU memory when instantiated nets are
