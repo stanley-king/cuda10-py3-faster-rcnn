@@ -26,17 +26,17 @@ import caffe, os, sys, cv2
 import argparse
 
 CLASSES = ('__background__',
-           'aeroplane', 'bicycle', 'bird', 'boat',
-           'bottle', 'bus', 'car', 'cat', 'chair',
-           'cow', 'diningtable', 'dog', 'horse',
-           'motorbike', 'person', 'pottedplant',
-           'sheep', 'sofa', 'train', 'tvmonitor'
+           # 'aeroplane', 'bicycle', 'bird', 'boat',
+           # 'bottle', 'bus', 'car', 'cat', 'chair',
+           # 'cow', 'diningtable', 'dog', 'horse',
+           # 'motorbike', 'person', 'pottedplant',
+           # 'sheep', 'sofa', 'train', 'tvmonitor'
            # ,
-           # 'LongKnife','PlasticLiq','Knife',
-           # 'Cai-Dao','AerosolCan','Pistol',
-           # 'HandGrenade','Revolver','SmallFoldingKnife',
-           # 'FeTin','AlTin','GlassLiq',
-           # 'KnifeLine'
+           'longknife', 'knifeline2', 'altin',
+           'plasticliq', 'knifeline', 'cai-dao',
+           'fetin', 'pistol', 'knife',
+           'smallfoldingknife', 'revolver', 'handgrenade',
+           'aerosolcan', 'glassliq'
            )
 
 NETS = {'vgg16': ('VGG16','VGG16_faster_rcnn_final.caffemodel'),
@@ -74,7 +74,6 @@ def vis_detections(im, class_name, dets, thresh=0.5):
     plt.axis('off')
     plt.tight_layout()
     plt.draw()
-    plt.show()
 
 def demo(net, im_file):
     """Detect object classes in an image using pre-computed object proposals."""
@@ -147,19 +146,19 @@ if __name__ == '__main__':
     for i in range(2):
         _, _= im_detect(net, im)
 
-    # path = os.path.join(cfg.DATA_DIR, 'VOCdevkit2007/VOC2007/JPEGImages')
-    # files = os.listdir(path)
-    # for file in files:
-    #     demo(net, os.path.join(path,file))
+    path = os.path.join(cfg.DATA_DIR, 'VOCdevkit2007/VOC2007/JPEGImages')
+    files = os.listdir(path)
+    for file in files:
+        demo(net, os.path.join(path,file))
 
-    im_names = ['000456.jpg', '000542.jpg', '001150.jpg',
-                '001763.jpg', '004545.jpg']
-
-    # im_names = ['000456.jpg']
-    for im_name in im_names:
-        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-        print('Demo for data/demo/{}'.format(im_name))
-        im_file = os.path.join(cfg.DATA_DIR, 'demo', im_name)
-        demo(net, im_file)
+    # im_names = ['000456.jpg', '000542.jpg', '001150.jpg',
+    #             '001763.jpg', '004545.jpg']
+    #
+    # # im_names = ['000456.jpg']
+    # for im_name in im_names:
+    #     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    #     print('Demo for data/demo/{}'.format(im_name))
+    #     im_file = os.path.join(cfg.DATA_DIR, 'demo', im_name)
+    #     demo(net, im_file)
 
     plt.show()
