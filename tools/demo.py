@@ -74,6 +74,7 @@ def vis_detections(im, class_name, dets, thresh=0.5):
     plt.axis('off')
     plt.tight_layout()
     plt.draw()
+    plt.show()
 
 def demo(net, im_file):
     """Detect object classes in an image using pre-computed object proposals."""
@@ -146,7 +147,8 @@ if __name__ == '__main__':
     for i in range(2):
         _, _= im_detect(net, im)
 
-    path = os.path.join(cfg.DATA_DIR, 'VOCdevkit2007/VOC2007/JPEGImages')
+    # path = os.path.join(cfg.DATA_DIR, 'VOCdevkit2007/VOC2007/JPEGImages')
+    path = os.path.join(cfg.DATA_DIR, 'demo')
     files = os.listdir(path)
     for file in files:
         demo(net, os.path.join(path,file))
