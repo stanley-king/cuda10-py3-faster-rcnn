@@ -9,6 +9,8 @@
 
 """Train a Fast R-CNN network on a region of interest database."""
 
+import matplotlib.pyplot as plt
+
 import _init_paths
 
 from fast_rcnn.train  import get_training_roidb, train_net

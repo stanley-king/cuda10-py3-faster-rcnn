@@ -216,7 +216,13 @@ if __name__ == '__main__':
         cfg_from_list(args.set_cfgs)
     cfg.GPU_ID = args.gpu_id
 
-    args.pretrained_model = 'E:\\study\\py-faster-rcnn\\data\\imagenet_models\\ZF.v2.caffemodel'
+    model_path = os.path.join(cfg.DATA_DIR,'imagenet_models')
+    if args.net_name == 'ZF':
+        args.pretrained_model = os.path.join(model_path,'ZF.v2.caffemodel')
+    elif args.net_name == 'VGG16':
+        args.pretrained_model = os.path.join(model_path,'VGG16.v2.caffemodel')
+    else:
+        args.pretrained_model = os.path.join(model_path,'VGG_CNN_M_1024.v2.caffemodel')
 
     # --------------------------------------------------------------------------
     # Pycaffe doesn't reliably free GPU memory when instantiated nets are
