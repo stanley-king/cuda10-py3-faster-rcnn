@@ -15,7 +15,7 @@ def parse_rec(filename):
     objects = []
     for obj in tree.findall('object'):
         obj_struct = {}
-        obj_struct['name'] = obj.find('name').text
+        obj_struct['name'] = obj.find('name').text.lower()
         obj_struct['pose'] = obj.find('pose').text
         obj_struct['truncated'] = int(obj.find('truncated').text)
         obj_struct['difficult'] = int(obj.find('difficult').text)
@@ -112,11 +112,11 @@ def voc_eval(detpath,
                     i + 1, len(imagenames)))
         # save
         print('Saving cached annotations to {:s}'.format(cachefile))
-        with open(cachefile, 'w') as f:
+        with open(cachefile, 'wb') as f:
             cPickle.dump(recs, f)
     else:
         # load
-        with open(cachefile, 'r') as f:
+        with open(cachefile, 'rb') as f:
             recs = cPickle.load(f)
 
     # extract gt objects for this class

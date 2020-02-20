@@ -5,7 +5,7 @@
 // Written by Shaoqing Ren
 // ------------------------------------------------------------------
 
-//#include "gpu_nms.hpp"
+#include "gpu_nms.hpp"
 #include <vector>
 #include <iostream>
 
@@ -139,6 +139,8 @@ void _nms(long* keep_out, int* num_out, const float* boxes_host, int boxes_num,
     }
   }
   *num_out = num_to_keep;
+
+  std::cerr << "num_out = " << *num_out << std::endl;
 
   CUDA_CHECK(cudaFree(boxes_dev));
   CUDA_CHECK(cudaFree(mask_dev));

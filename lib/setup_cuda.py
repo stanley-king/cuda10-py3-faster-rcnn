@@ -9,11 +9,17 @@ from setuptools import setup, find_packages, Extension
 from setuptools.command.build_ext import build_ext
 import sys
 
+#,sm_52,sm_60,sm_61,sm_70,sm_75
 # CUDA specific config
 # nvcc is assumed to be in user's PATH
-nvcc_compile_args = ['-O', '--ptxas-options=-v', '-arch=sm_35', '-c', '--compiler-options=-fPIC']
+# nvcc_compile_args = ['-O', '--ptxas-options=-v', '-arch=sm_35', '-c', '--compiler-options=-fPIC']
+#;compute_50,sm_50;compute_52,sm_52;compute_60,sm_60;compute_61,sm_61;compute_70,sm_70;compute_75,sm_75;
+nvcc_compile_args = ['-O', '--ptxas-options=-v', '-arch=compute_35', '-code=sm_35,sm_52,sm_61', '-c',
+                     '--compiler-options=-fPIC']
 nvcc_compile_args = os.environ.get('NVCCFLAGS', '').split() + nvcc_compile_args
-cuda_libs = ['cublas']
+# cuda_libs = ['cublas']
+cuda_libs = [r'C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\lib\x64\cublas.lib',
+             r'C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\lib\x64\cudart.lib']
 
 
 # Obtain the numpy include directory.  This logic works across numpy versions.
@@ -24,13 +30,13 @@ except AttributeError:
 
 
 cudamat_ext = Extension('nms.gpu_nms',
-                        sources=[
+                        sources=['nms\\gpu_nms.pyx',
                                 'nms\\gpu_nms.cu'
                                 ],
                         language='c++',
                         libraries=cuda_libs,
                         extra_compile_args=nvcc_compile_args,
-                        include_dirs = [numpy_include, 'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.0/include'])
+                        include_dirs = [numpy_include, r'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.0/include'])
 
 
 class CUDA_build_ext(build_ext):

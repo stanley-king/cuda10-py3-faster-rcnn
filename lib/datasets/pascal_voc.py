@@ -20,8 +20,6 @@ import pickle as cPickle
 import subprocess
 import uuid
 
-
-
 class pascal_voc(imdb):
     def __init__(self, image_set, year, devkit_path=None):
         imdb.__init__(self, 'voc_' + year + '_' + image_set)
@@ -31,17 +29,14 @@ class pascal_voc(imdb):
                             else devkit_path
         self._data_path = os.path.join(self._devkit_path, 'VOC' + self._year)
         self._classes = ('__background__', # always index 0
-                         # 'aeroplane', 'bicycle', 'bird', 'boat',
-                         # 'bottle', 'bus', 'car', 'cat', 'chair',
-                         # 'cow', 'diningtable', 'dog', 'horse',
-                         # 'motorbike', 'person', 'pottedplant',
-                         # 'sheep', 'sofa', 'train', 'tvmonitor'
-                         'longknife', 'knifeline2', 'altin',
-                         'plasticliq', 'knifeline', 'cai-dao',
-                         'fetin', 'pistol', 'knife',
-                         'smallfoldingknife', 'revolver', 'handgrenade',
-                         'aerosolcan', 'glassliq'
-                         )
+                         'umbrella', 'knife', 'pistol',
+                         'longknife', 'aerosolcan', 'shoebow',
+                         'altin', 'shoebowline', 'handgrenade',
+                         'smallfoldingknife', 'plasticliq', 'cai-dao',
+                         'glassescase', 'fetin', 'revolver',
+                         'knifeline2', 'knifeline', 'showbowline',
+                         'alaerosolcan', 'glassliq')
+
         self._class_to_ind = dict(zip(self.classes, range(self.num_classes)))
         self._image_ext = '.jpg'
         self._image_index = self._load_image_set_index()
@@ -258,6 +253,9 @@ class pascal_voc(imdb):
             filename = self._get_voc_results_file_template().format(cls)
             with open(filename, 'wt') as f:
                 for im_ind, index in enumerate(self.image_index):
+                    # if im_ind >= 10:
+                    #     break
+
                     dets = all_boxes[cls_ind][im_ind]
                     if dets == []:
                         continue
@@ -269,11 +267,12 @@ class pascal_voc(imdb):
                                        dets[k, 2] + 1, dets[k, 3] + 1))
 
     def _do_python_eval(self, output_dir = 'output'):
-        annopath = os.path.join(
+        apath = os.path.join(
             self._devkit_path,
             'VOC' + self._year,
-            'Annotations',
-            '{:s}.xml')
+            'Annotations')
+        annopath = "{}\\{}".format(apath,'{:s}.xml')
+
         imagesetfile = os.path.join(
             self._devkit_path,
             'VOC' + self._year,
@@ -296,7 +295,7 @@ class pascal_voc(imdb):
                 use_07_metric=use_07_metric)
             aps += [ap]
             print('AP for {} = {:.4f}'.format(cls, ap))
-            with open(os.path.join(output_dir, cls + '_pr.pkl'), 'w') as f:
+            with open(os.path.join(output_dir, cls + '_pr.pkl'), 'wb') as f:
                 cPickle.dump({'rec': rec, 'prec': prec, 'ap': ap}, f)
         print('Mean AP = {:.4f}'.format(np.mean(aps)))
         print('~~~~~~~~')

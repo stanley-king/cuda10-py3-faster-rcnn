@@ -60,6 +60,9 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
 
+    NETS = {'vgg16': ('VGG16', 'VGG16_faster_rcnn_final.caffemodel'),
+            'zf': ('ZF', 'ZF_faster_rcnn_final.caffemodel')}
+
     print('Called with args:')
     print(args)
 
@@ -73,15 +76,26 @@ if __name__ == '__main__':
     print('Using config:')
     pprint.pprint(cfg)
 
-    while not os.path.exists(args.caffemodel) and args.wait:
+    caffemodel = os.path.join(cfg.DATA_DIR, 'faster_rcnn_models',
+                              NETS[args.caffemodel][1])
+    print('caffemodel=',caffemodel)
+
+    if not os.path.isfile(caffemodel):
+        raise IOError(('{:s} not found.\nDid you run ./data/script/'
+                       'fetch_faster_rcnn_models.sh?').format(caffemodel))
+
+
+    while not os.path.exists(caffemodel) and args.wait:
         print('Waiting for {} to exist...'.format(args.caffemodel))
         time.sleep(10)
 
     caffe.set_mode_gpu()
     caffe.set_device(args.gpu_id)
-    net = caffe.Net(args.prototxt, args.caffemodel, caffe.TEST)
-    net.name = os.path.splitext(os.path.basename(args.caffemodel))[0]
+    # net = caffe.Net(args.prototxt, args.caffemodel, caffe.TEST)
+    net = caffe.Net(args.prototxt, caffemodel, caffe.TEST)
+    net.name = 'VGG16' #os.path.splitext(os.path.basename(args.caffemodel))[0]
 
+    cfg.TEST.HAS_RPN = True
     imdb = get_imdb(args.imdb_name)
     imdb.competition_mode(args.comp_mode)
     if not cfg.TEST.HAS_RPN:

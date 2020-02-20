@@ -25,19 +25,45 @@ import scipy.io as sio
 import caffe, os, sys, cv2
 import argparse
 
-CLASSES = ('__background__',
-           # 'aeroplane', 'bicycle', 'bird', 'boat',
-           # 'bottle', 'bus', 'car', 'cat', 'chair',
-           # 'cow', 'diningtable', 'dog', 'horse',
-           # 'motorbike', 'person', 'pottedplant',
-           # 'sheep', 'sofa', 'train', 'tvmonitor'
-           # ,
-           'longknife', 'knifeline2', 'altin',
-           'plasticliq', 'knifeline', 'cai-dao',
-           'fetin', 'pistol', 'knife',
-           'smallfoldingknife', 'revolver', 'handgrenade',
-           'aerosolcan', 'glassliq'
-           )
+import logging
+import logging.handlers
+
+from io import BytesIO as StringIO
+class StreamToLogger(StringIO):
+    """
+    Fake file-like stream object that redirects writes to a logger instance.
+    """
+    def __init__(self, logger, log_level=logging.INFO):
+        self.logger = logger
+        self.log_level = log_level
+        self.linebuf = ''
+
+    def write(self, buf):
+        for line in buf.rstrip().splitlines():
+            self.logger.log(self.log_level, line.rstrip())
+
+def init_logger(dirpath,filename):
+    logger = logging.getLogger('DetectService')
+    onem = 1024 * 1024
+    handler = logging.handlers.RotatingFileHandler(os.path.join(dirpath, filename),maxBytes=10 * onem,backupCount=5)
+
+    formatter = logging.Formatter('%(asctime)s  %(name)-12s %(levelname)-8s %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
+
+    sys.stdout = StreamToLogger(logger)
+    sys.stderr = StreamToLogger(logger)
+
+
+CLASSES = ('__background__',  # always index 0
+           'umbrella', 'knife', 'pistol',
+           'longknife', 'aerosolcan', 'shoebow',
+           'altin', 'shoebowline', 'handgrenade',
+           'smallfoldingknife', 'plasticliq', 'cai-dao',
+           'glassescase', 'fetin', 'revolver',
+           'knifeline2', 'knifeline', 'showbowline',
+           'alaerosolcan', 'glassliq')
 
 NETS = {'vgg16': ('VGG16','VGG16_faster_rcnn_final.caffemodel'),
         'zf': ('ZF','ZF_faster_rcnn_final.caffemodel')}
@@ -118,7 +144,17 @@ def parse_args():
 
     return args
 
+import inspect
+
 if __name__ == '__main__':
+    this_file = inspect.getfile(inspect.currentframe())
+    dirpath = os.path.dirname(this_file)
+    init_logger(dirpath, 'demo.log')
+    # file = open(os.path.join(dirpath, 'demo.log'),'a')
+    # sys.stderr = file
+    # sys.stdout = file
+    # sys.__stderr__ = file
+
     cfg.TEST.HAS_RPN = True  # Use RPN for proposals
 
     args = parse_args()

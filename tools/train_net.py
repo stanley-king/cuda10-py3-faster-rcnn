@@ -82,7 +82,7 @@ def combined_roidb(imdb_names):
 
 def run():
     args = parse_args()
-    cfg.GPU_ID = 2
+    # cfg.GPU_ID = 2
 
 
     print('Called with args:')
